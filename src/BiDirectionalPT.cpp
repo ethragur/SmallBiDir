@@ -91,7 +91,8 @@ std::vector<LightPath> BiDirectionalPT::traceLightRays(const int bounces) const
 			//TODO Russian Roulette, it is biased right now
 			Color col = hit_object.color;
 			cf = cf.MultComponents(col);
-			cl = cl + cf.MultComponents(hit_object.emission);
+			//cl = cl + cf.MultComponents(hit_object.emission);
+			cl = cf.MultComponents(curLight->emission);
 
 			//save the hitpoint and the color of the light ray
 			//and let it bounce again :)
@@ -330,19 +331,17 @@ Color BiDirectionalPT::shootShadowRay(const std::vector<LightPath> & lightPath, 
 		for(int i = 0; i < lightPath.size(); i++)
 		{
 			//TODO: copy id from object or check try direct comparison
-			if(checkVisibility(lightPath[i].hitpoint, hitpoint, id))
+			Vector dir = lightPath[i].hitpoint - hitpoint;
+			Vector dirNorm = dir.Normalized();
+			double distanceSqr = dir.Dot(dir);
+			if(checkVisibility(lightPath[i].hitpoint, dirNorm, id))
 			{
-				const Vector dir = Vector(hitpoint - lightPath[i].hitpoint).Normalized();
-				const double dot = object.get_normal(hitpoint).Dot(dir);
-				double diffPdf;
-				if(diffPdf <= 0)
-					diffPdf = 0.0;
-				else
-					diffPdf = 1.0 / (2.0 * M_PI * dot);
-
+				const Vector & enlightenObjNormal = our_scene.get_shapes()[lightPath[i].objectid]->get_normal(lightPath[i].hitpoint);
+				double diffEnlightenPdf = fabs(dirNorm.Dot(enlightenObjNormal)) * M_1_PI;
+				double diffEyePdf = fabs(dirNorm.Dot(object.get_normal(hitpoint))) * M_1_PI;
 
 				//First light constant which has to be added
-				e = e + object.color.MultComponents(lightPath[i].absorbedColor * (dir.Dot(object.get_normal(hitpoint) * diffPdf))) / M_PI;
+				e = e + lightPath[i].absorbedColor * diffEnlightenPdf * diffEyePdf / distanceSqr;
 				//e = e + (lightPath[i].absorbedColor * (dir.Dot(object.get_normal(hitpoint) * diffPdf))) / M_PI;
 
 			}
