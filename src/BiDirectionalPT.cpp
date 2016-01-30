@@ -184,7 +184,7 @@ Color BiDirectionalPT::Radiance(const Ray &ray, const std::vector<LightPath> & l
 			else if(isNotLight || sampleLights) 
 				cl = cl + cf.MultComponents(explicitComputationOfDirectLight(hitpoint, obj, nl));
 			sampleLights = false;
-		//	cl = cl + shootShadowRay(lp, obj, hitpoint, id);
+			cl = cl + cf.MultComponents(shootShadowRay(lp, obj, hitpoint, id));
 		}
 		else if (obj.refl == SPEC)
 		{
@@ -342,8 +342,8 @@ Color BiDirectionalPT::shootShadowRay(const std::vector<LightPath> & lightPath, 
 
 
 				//First light constant which has to be added
-				//e = e + object.color.MultComponents(lightPath[i].absorbedColor * (dir.Dot(object.get_normal(hitpoint) * diffPdf))) / M_PI;
-				e = e + (lightPath[i].absorbedColor * (dir.Dot(object.get_normal(hitpoint) * diffPdf))) / M_PI;
+				e = e + object.color.MultComponents(lightPath[i].absorbedColor * (dir.Dot(object.get_normal(hitpoint) * diffPdf))) / M_PI;
+				//e = e + (lightPath[i].absorbedColor * (dir.Dot(object.get_normal(hitpoint) * diffPdf))) / M_PI;
 
 			}
 			else
