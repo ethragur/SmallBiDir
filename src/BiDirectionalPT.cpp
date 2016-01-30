@@ -21,7 +21,7 @@ void BiDirectionalPT::getLightEmitters()
 			continue; /* Skip objects that are not light sources */
 		else
 		{
-			lightEmitters.push_back(cur_obj);
+			lightEmitters[i] = cur_obj;
 		}
 	}
 	noLights = lightEmitters.size();
@@ -44,10 +44,11 @@ std::vector<LightPath> BiDirectionalPT::traceLightRays(const int bounces) const
 	std::vector<LightPath> lightPath;
 	lightPath.reserve(bounces*noLights);
 
-	for(int i = 0; i < noLights; i++)
+	//for(int i = 0; i < noLights; i++)
+		for(const auto & light : lightEmitters) 
 	{
 		//get current light
-		Shape* curLight = lightEmitters[i];
+		Shape* curLight = light.second;
 		Vector origin = curLight->get_position();
 		Vector nl = curLight->get_normal(origin);
 
@@ -86,8 +87,8 @@ std::vector<LightPath> BiDirectionalPT::traceLightRays(const int bounces) const
 
 			//TODO Russian Roulette, it is biased right now
 			Color col = hit_object.color;
-			cl = cl + cf.MultComponents(hit_object.emission);
 			cf = cf.MultComponents(col);
+			cl = cl + cf.MultComponents(hit_object.emission);
 
 			//save the hitpoint and the color of the light ray
 			//and let it bounce again :)
@@ -95,7 +96,7 @@ std::vector<LightPath> BiDirectionalPT::traceLightRays(const int bounces) const
 			//That is the accumulated reflectance needed for the Radiance(). But I have no idea what to do with it here
 			if (hit_object.refl == DIFF)
 			{
-				lightPath.push_back(LightPath(hitpoint, cl, i, id));
+				lightPath.push_back(LightPath(hitpoint, cl, light.first, id));
 				dir = diffuseBRDF(nl);
 			}
 			else if (hit_object.refl == SPEC)
@@ -132,11 +133,12 @@ Color BiDirectionalPT::Radiance(const Ray &ray, const std::vector<LightPath> & l
 	int depth = 0;
 	double t;	//distance to intersection
 	int id = 0; //id of intersected object
+	bool sampleLights = true; // if last hit was diffuse, don't sample lights
 	Ray r = ray;
 	Color cl(0,0,0); //accumulated color
 	Color cf(1,1,1); //accumulated reflectance
 
-	for(;;)
+	for(int i = 0;; i++)
 	{
 		if (!Intersect(r, t, id))   /* No intersection with scene */
 			return cl;
@@ -157,7 +159,7 @@ Color BiDirectionalPT::Radiance(const Ray &ray, const std::vector<LightPath> & l
 		/* Maximum RGB reflectivity for Russian Roulette */
 		double p = col.Max();
 
-		cl = cl + cf.MultComponents(obj.emission);
+		//cl = cl + cf.MultComponents(obj.emission);
 
 		if (++depth > 5 || !p)   /* After 5 bounces or if max reflectivity is zero */
 		{
@@ -173,29 +175,39 @@ Color BiDirectionalPT::Radiance(const Ray &ray, const std::vector<LightPath> & l
 		if (obj.refl == DIFF)
 		{
 			dir = diffuseBRDF(nl);
-			cl = cl + explicitComputationOfDirectLight(hitpoint, obj, nl);
+			bool isNotLight = lightEmitters.find(id) == lightEmitters.end();
+			if(!isNotLight && i == 0)
+				cl = cl + cf.MultComponents(obj.emission);
+			else if(isNotLight || sampleLights) 
+				cl = cl + cf.MultComponents(explicitComputationOfDirectLight(hitpoint, obj, nl));
+			sampleLights = false;
 		//	cl = cl + shootShadowRay(lp, obj, hitpoint, id);
 		}
 		else if (obj.refl == SPEC)
 		{
 			dir = specularBRDF(r, nl);
+			sampleLights = true;
 		}
 		else if(obj.refl == GLOSSY)
 		{
 			dir = glossyBRDF(r, nl);
+			sampleLights = true;
 		}
 		else if(obj.refl == TRANSL)
 		{
 			dir = translBRDF(r, n, nl, cf);
+			sampleLights = true;
 		}
 		else if(obj.refl == REFR)
 		{
 			dir = refrBRDF(r, n, nl, cf);
+			sampleLights = true;
 		}
 		else
 		{
 			//This case should not exist!!!
 			dir = Vector(0,0,0);
+			sampleLights = true;
 		}
 
 		r = Ray(hitpoint, dir);
@@ -205,11 +217,11 @@ Color BiDirectionalPT::Radiance(const Ray &ray, const std::vector<LightPath> & l
 Color BiDirectionalPT::explicitComputationOfDirectLight(const Vector & hitpoint, const Shape & object, const Vector & nl) const
 {
 	Vector e(0,0,0);	
-	for(int i = 0; i < noLights; i++)
+	//for(int i = 0; i < noLights; i++)
+	for(const auto & light : lightEmitters)
 	{
-		const Shape & curLight = *lightEmitters[i];	
+		const Shape & curLight = *light.second;	
 		/* Randomly sample spherical light source from surface intersection */
-
 		/* Set up local orthogonal coordinate system su,sv,sw towards light source */
 		Vector curCenter = curLight.get_position();
 		Vector sw = (curCenter - hitpoint).Normalized(); 
@@ -241,14 +253,12 @@ Color BiDirectionalPT::explicitComputationOfDirectLight(const Vector & hitpoint,
 		/* Shoot shadow ray, check if intersection is with light source */
 		double t;
 		int id = 0;
-		if (Intersect(Ray(hitpoint,l), t, id) && id==i)
+		if (Intersect(Ray(hitpoint,l), t, id) && id == light.first)
 		{
-			double omega = 2 * M_PI * (1 - cos_a_max);
-
+			double omega = 2.0 * M_PI * (1.0 - cos_a_max);
 			/* Add diffusely reflected light from light source; note constant BRDF 1/PI */
-			e = e + object.color.MultComponents(curLight.emission * l.Dot(nl) * omega) * M_1_PI;
+			e = e + curLight.emission * l.Dot(nl) * omega * M_1_PI;
 		}
-		
 	}
 
 	return e;

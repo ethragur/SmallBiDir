@@ -2,6 +2,7 @@
 
 
 #include "PathTracer.h"
+#include <map>
 
 struct LightPath
 {
@@ -29,7 +30,8 @@ class BiDirectionalPT : public PathTracer
 	
 	private:
 		//variables:
-		std::vector<Shape*> lightEmitters;
+		//std::vector<Shape*> lightEmitters;
+		std::map<int,Shape*> lightEmitters;
 		unsigned int noLights;
 		//functions:
 		void getLightEmitters();

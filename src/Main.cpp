@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
 		std::cout << "Paramaters: <Nr. of Subsamples> <Scenefile>" << std::endl << "Usage Example: ./PathTracing 2 scene.obj" << std::endl;
 
 	BiDirectionalPT p(scene_filename);
+	//PathTracer p(scene_filename);
 	Renderer r(1024, 768, samples);
 
 	std::cout << "Starting to render..." << std::endl;

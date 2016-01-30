@@ -193,13 +193,13 @@ Color PathTracer::diffuseBRDF(const Shape &obj, const Ray & ray, const Vector & 
 			double omega = 2 * M_PI * (1 - cos_a_max);
 
 			/* Add diffusely reflected light from light source; note constant BRDF 1/PI */
-			e = e + obj.color.MultComponents(cur_obj.emission * l.Dot(nl) * omega) * M_1_PI;
+			e = e + cur_obj.emission * l.Dot(nl) * omega * M_1_PI;
 		}
 	}
 	
 	/* Return potential light emission, direct lighting, and indirect lighting (via
 	   recursive call for Monte-Carlo integration */
-	return obj.emission * E + e + col.MultComponents(Radiance(Ray(hitpoint, d), depth, 0));
+	return obj.emission * E + obj.color.MultComponents(e) + col.MultComponents(Radiance(Ray(hitpoint, d), depth, 0));
 
 }
 
