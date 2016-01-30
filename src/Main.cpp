@@ -43,7 +43,7 @@
 *******************************************************************/
 int main(int argc, char *argv[])
 {
-	std::string scene_filename = "../data/scene_new.obj";
+	std::string scene_filename = "../data/scene.obj";
 	int samples = 1;
 	time_t start, end;
 

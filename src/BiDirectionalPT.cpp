@@ -29,7 +29,7 @@ void BiDirectionalPT::getLightEmitters()
 
 Color BiDirectionalPT::calculatePixelColor(const Ray & ray) const
 {
-	std::vector<LightPath> allLightpaths = traceLightRays(2);
+	std::vector<LightPath> allLightpaths = traceLightRays(4);
 	return Radiance(ray, allLightpaths);
 }
 
@@ -61,8 +61,8 @@ std::vector<LightPath> BiDirectionalPT::traceLightRays(const int bounces) const
 		Ray r = Ray(origin + dir * (curLight->radius + 0.1), dir);
 		double t;
 		int id = 0;
-		Vector cf(0,0,0);
-		Vector cl(1,1,1);
+		Vector cf(1,1,1);
+		Vector cl(0,0,0);
 
 		
 		for(int j = 0; j < bounces; j++)
@@ -97,7 +97,6 @@ std::vector<LightPath> BiDirectionalPT::traceLightRays(const int bounces) const
 			//save the hitpoint and the color of the light ray
 			//and let it bounce again :)
 			Vector dir;
-			//That is the accumulated reflectance needed for the Radiance(). But I have no idea what to do with it here
 			if (hit_object.refl == DIFF)
 			{
 				lightPath.push_back(LightPath(hitpoint, cl, it->first, id));
@@ -163,7 +162,7 @@ Color BiDirectionalPT::Radiance(const Ray &ray, const std::vector<LightPath> & l
 		/* Maximum RGB reflectivity for Russian Roulette */
 		double p = col.Max();
 
-		//cl = cl + cf.MultComponents(obj.emission);
+	//	cl = cl + cf.MultComponents(obj.emission);
 
 		if (++depth > 5 || !p)   /* After 5 bounces or if max reflectivity is zero */
 		{
@@ -186,6 +185,7 @@ Color BiDirectionalPT::Radiance(const Ray &ray, const std::vector<LightPath> & l
 				cl = cl + cf.MultComponents(explicitComputationOfDirectLight(hitpoint, obj, nl));
 			sampleLights = false;
 			cl = cl + cf.MultComponents(shootShadowRay(lp, obj, hitpoint, id));
+		
 		}
 		else if (obj.refl == SPEC)
 		{
@@ -330,8 +330,8 @@ Color BiDirectionalPT::shootShadowRay(const std::vector<LightPath> & lightPath, 
 	{
 		for(int i = 0; i < lightPath.size(); i++)
 		{
-			//TODO: copy id from object or check try direct comparison
-			Vector dir = lightPath[i].hitpoint - hitpoint;
+			//create directional vector between light hitpoint and camera hitpoint
+			Vector dir = hitpoint - lightPath[i].hitpoint ;
 			Vector dirNorm = dir.Normalized();
 			double distanceSqr = dir.Dot(dir);
 			if(checkVisibility(lightPath[i].hitpoint, dirNorm, id))

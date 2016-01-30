@@ -26,6 +26,11 @@ public:
         return Vector(x - b.x, y - b.y, z - b.z);
     }
 
+	bool operator==(const Vector &b) const
+	{
+		return (x == b.x && y == b.y && z == b.z); 
+	}
+
     Vector operator/(double c) const
     {
         return Vector(x / c, y / c, z / c);
