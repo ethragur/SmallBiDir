@@ -45,10 +45,13 @@ std::vector<LightPath> BiDirectionalPT::traceLightRays(const int bounces) const
 	lightPath.reserve(bounces*noLights);
 
 	//for(int i = 0; i < noLights; i++)
-		for(const auto & light : lightEmitters) 
+	std::map<int,Shape*>::const_iterator it;
+	//c++11
+	//for(const auto & light : lightEmitters) 
+	for(it = lightEmitters.begin(); it != lightEmitters.end(); it++)
 	{
 		//get current light
-		Shape* curLight = light.second;
+		Shape* curLight = it->second;
 		Vector origin = curLight->get_position();
 		Vector nl = curLight->get_normal(origin);
 
@@ -96,7 +99,7 @@ std::vector<LightPath> BiDirectionalPT::traceLightRays(const int bounces) const
 			//That is the accumulated reflectance needed for the Radiance(). But I have no idea what to do with it here
 			if (hit_object.refl == DIFF)
 			{
-				lightPath.push_back(LightPath(hitpoint, cl, light.first, id));
+				lightPath.push_back(LightPath(hitpoint, cl, it->first, id));
 				dir = diffuseBRDF(nl);
 			}
 			else if (hit_object.refl == SPEC)
@@ -218,9 +221,11 @@ Color BiDirectionalPT::explicitComputationOfDirectLight(const Vector & hitpoint,
 {
 	Vector e(0,0,0);	
 	//for(int i = 0; i < noLights; i++)
-	for(const auto & light : lightEmitters)
+	std::map<int,Shape*>::const_iterator it;
+	//c++11
+	for(it = lightEmitters.begin(); it != lightEmitters.end(); it++)
 	{
-		const Shape & curLight = *light.second;	
+		const Shape & curLight = *((it)->second);	
 		/* Randomly sample spherical light source from surface intersection */
 		/* Set up local orthogonal coordinate system su,sv,sw towards light source */
 		Vector curCenter = curLight.get_position();
@@ -253,7 +258,7 @@ Color BiDirectionalPT::explicitComputationOfDirectLight(const Vector & hitpoint,
 		/* Shoot shadow ray, check if intersection is with light source */
 		double t;
 		int id = 0;
-		if (Intersect(Ray(hitpoint,l), t, id) && id == light.first)
+		if (Intersect(Ray(hitpoint,l), t, id) && id == it->first)
 		{
 			double omega = 2.0 * M_PI * (1.0 - cos_a_max);
 			/* Add diffusely reflected light from light source; note constant BRDF 1/PI */
@@ -337,7 +342,8 @@ Color BiDirectionalPT::shootShadowRay(const std::vector<LightPath> & lightPath, 
 
 
 				//First light constant which has to be added
-				e = object.color.MultComponents(lightPath[i].absorbedColor * (dir.Dot(object.get_normal(hitpoint) * diffPdf))) / M_PI;
+				//e = e + object.color.MultComponents(lightPath[i].absorbedColor * (dir.Dot(object.get_normal(hitpoint) * diffPdf))) / M_PI;
+				e = e + (lightPath[i].absorbedColor * (dir.Dot(object.get_normal(hitpoint) * diffPdf))) / M_PI;
 
 			}
 			else
