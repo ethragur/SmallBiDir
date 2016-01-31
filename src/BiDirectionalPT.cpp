@@ -177,7 +177,7 @@ Color BiDirectionalPT::Radiance(const Ray &ray, const std::vector<LightPath> & l
 		double p = col.Max();
 
 
-		if(obj.refl != DIFF)
+		if(sampleLights || obj.refl != DIFF)
 			cl = cl + cf.MultComponents(obj.emission);
 		if (++depth > 5 || !p)   /* After 5 bounces or if max reflectivity is zero */
 		{
