@@ -4,11 +4,11 @@ PathTracer::PathTracer(const std::string & scene_name)
 {
 	our_scene.load_scene(scene_name, std::string("../data/"));
 //	Sphere *sp0 = new Sphere(16.5,	Vector(27, 16.5, -10), Vector(), Vector(1.0, 1.0, 1.0) * .999, REFR);
-//	Sphere *sp1 = new Sphere(16.5,  Vector(-20, 16.5, 10), Vector(), Vector(1.0, 1.0, 1.0) * .999, REFR);
+	Sphere *sp1 = new Sphere(16.5,  Vector(-20, 16.5, 10), Vector(), Vector(1.0, 1.0, 1.0) * .999, REFR);
 	//Sphere *sp2 = new Sphere(8.5,  Vector(-20, 8.5, 25), Vector(), Vector(1.0, 1.0, 0.0) * .999, DIFF);
 	Sphere *sp3 = new Sphere(2.0, Vector(20, 50, -15), Vector(80,80,80), Vector(1.0,1.0,1.0) * .999, DIFF);
 //	our_scene.add_sphere(sp0);
-//	our_scene.add_sphere(sp1);
+	our_scene.add_sphere(sp1);
 //	our_scene.add_sphere(sp2);
 	our_scene.add_sphere(sp3);
 	numObjects = our_scene.get_shapes().size();

@@ -43,7 +43,7 @@
 *******************************************************************/
 int main(int argc, char *argv[])
 {
-	std::string scene_filename = "scene1";
+	std::string scene_filename = "scene3";
 	int samples = 1;
 	time_t start, end;
 	unsigned int lightbounces = 2;
