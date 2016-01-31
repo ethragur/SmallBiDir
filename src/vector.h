@@ -82,6 +82,7 @@ public:
     {
         return fmax(x, fmax(x, y));
     }
+	
 
     Vector &clamp()
     {

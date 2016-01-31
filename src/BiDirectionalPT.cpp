@@ -1,16 +1,30 @@
 #include "BiDirectionalPT.h"
 
+BiDirectionalPT::BiDirectionalPT(const std::string & scene_name, unsigned int lightbounces) : PathTracer(scene_name)
+{
+	lightBounces = lightbounces;
+	getLightEmitters();
+}
+
+
+BiDirectionalPT::BiDirectionalPT(const Scene & scene, unsigned int lightbounces) : PathTracer(scene)
+{
+	lightBounces = lightbounces;
+	getLightEmitters();
+}
+
 BiDirectionalPT::BiDirectionalPT(const std::string & scene_name) : PathTracer(scene_name)
 {
+	lightBounces = 2;
 	getLightEmitters();
 }
 
 
 BiDirectionalPT::BiDirectionalPT(const Scene & scene) : PathTracer(scene)
 {
+	lightBounces = 2;
 	getLightEmitters();
 }
-
 void BiDirectionalPT::getLightEmitters()
 {
 	//save all light emitters and determine their size
@@ -29,7 +43,7 @@ void BiDirectionalPT::getLightEmitters()
 
 Color BiDirectionalPT::calculatePixelColor(const Ray & ray) const
 {
-	std::vector<LightPath> allLightpaths = traceLightRays(4);
+	std::vector<LightPath> allLightpaths = traceLightRays(lightBounces);
 	return Radiance(ray, allLightpaths);
 }
 
@@ -162,8 +176,9 @@ Color BiDirectionalPT::Radiance(const Ray &ray, const std::vector<LightPath> & l
 		/* Maximum RGB reflectivity for Russian Roulette */
 		double p = col.Max();
 
-	//	cl = cl + cf.MultComponents(obj.emission);
 
+		if(obj.refl != DIFF)
+			cl = cl + cf.MultComponents(obj.emission);
 		if (++depth > 5 || !p)   /* After 5 bounces or if max reflectivity is zero */
 		{
 			if (drand48() < p)			  /* Russian Roulette */
@@ -333,13 +348,13 @@ Color BiDirectionalPT::shootShadowRay(const std::vector<LightPath> & lightPath, 
 			//create directional vector between light hitpoint and camera hitpoint
 			Vector dir = hitpoint - lightPath[i].hitpoint ;
 			Vector dirNorm = dir.Normalized();
-			double distanceSqr = dir.Dot(dir);
 			if(checkVisibility(lightPath[i].hitpoint, dirNorm, id))
 			{
 				const Vector & enlightenObjNormal = our_scene.get_shapes()[lightPath[i].objectid]->get_normal(lightPath[i].hitpoint);
-				double diffEnlightenPdf = fabs(dirNorm.Dot(enlightenObjNormal)) * M_1_PI;
-				double diffEyePdf = fabs(dirNorm.Dot(object.get_normal(hitpoint))) * M_1_PI;
+				double diffEnlightenPdf = std::max(0.0, dirNorm.Dot(enlightenObjNormal)) * M_1_PI;
+				double diffEyePdf = std::max(0.0,dirNorm.Dot(object.get_normal(hitpoint))) * M_1_PI;
 
+				double distanceSqr = dir.Dot(dir);
 				//First light constant which has to be added
 				e = e + lightPath[i].absorbedColor * diffEnlightenPdf * diffEyePdf / distanceSqr;
 				//e = e + (lightPath[i].absorbedColor * (dir.Dot(object.get_normal(hitpoint) * diffPdf))) / M_PI;
@@ -518,11 +533,11 @@ Vector BiDirectionalPT::translBRDF(const Ray & ray, const Vector & n, const Vect
 
 	if (drand48() < P)
 	{
-		cf = cf.MultComponents(RP);
+		cf = cf * (RP);
 		return glos_refl_d;
 	}
 	
-	cf = cf.MultComponents(TP);
+	cf = cf * (TP);
 	return  tdir;
 
 }
@@ -585,11 +600,11 @@ Vector BiDirectionalPT::refrBRDF(const Ray & ray, const Vector & n, const Vector
 
 	if (drand48() < P)
 	{
-		cf = cf.MultComponents(RP);
+		cf = cf * (RP);
 		return reflectionV;
 	}
 	
-	cf = cf.MultComponents(TP);
+	cf = cf * (TP);
 	return tdir;
 
 }

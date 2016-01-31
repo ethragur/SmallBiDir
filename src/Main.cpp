@@ -43,23 +43,29 @@
 *******************************************************************/
 int main(int argc, char *argv[])
 {
-	std::string scene_filename = "../data/scene.obj";
+	std::string scene_filename = "scene1";
 	int samples = 1;
 	time_t start, end;
-
+	unsigned int lightbounces = 2;
 
 	if (argc == 2)
 		samples = atoi(argv[1]);
 	else if (argc == 3)
 	{
 		samples = atoi(argv[1]);
-		scene_filename = argv[2];
+		lightbounces = atoi(argv[2]);
+	}
+	else if (argc == 4)
+	{
+		samples = atoi(argv[1]);
+		lightbounces = atoi(argv[2]);
+		scene_filename = argv[3];
 	}
 	else
-		std::cout << "Paramaters: <Nr. of Subsamples> <Scenefile>" << std::endl << "Usage Example: ./PathTracing 2 scene.obj" << std::endl;
+		std::cout << "Paramaters: <Nr. of Subsamples> <LightSamples> <SceneName>"  << std::endl << "Usage Example: ./PathTracing 16 4 scene.obj" << std::endl;
 
-	BiDirectionalPT p(scene_filename);
-	//PathTracer p(scene_filename);
+	BiDirectionalPT p(std::string("../data/" + scene_filename + ".obj"), lightbounces);
+//	PathTracer p(scene_filename);
 	Renderer r(1024, 768, samples);
 
 	std::cout << "Starting to render..." << std::endl;
@@ -68,6 +74,4 @@ int main(int argc, char *argv[])
 	time(&end);
 
 	std::cout << "Done Rendering, took: " << difftime(end, start) << " seconds." << std::endl;
-
-
 }

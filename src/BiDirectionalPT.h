@@ -24,6 +24,8 @@ class BiDirectionalPT : public PathTracer
 	
 	public:
 		//functions
+		BiDirectionalPT(const std::string & scene_name, unsigned int lightbounces);
+		BiDirectionalPT(const Scene & scene, unsigned int lightbounces);
 		BiDirectionalPT(const std::string & scene_name);
 		BiDirectionalPT(const Scene & scene);
 		Color calculatePixelColor(const Ray & ray) const;
@@ -33,6 +35,7 @@ class BiDirectionalPT : public PathTracer
 		//std::vector<Shape*> lightEmitters;
 		std::map<int,Shape*> lightEmitters;
 		unsigned int noLights;
+		unsigned int lightBounces;
 		//functions:
 		void getLightEmitters();
 		std::vector<LightPath> traceLightRays(const int bounces) const;
