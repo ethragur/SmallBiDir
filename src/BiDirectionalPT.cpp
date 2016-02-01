@@ -1,26 +1,26 @@
 #include "BiDirectionalPT.h"
 
-BiDirectionalPT::BiDirectionalPT(const std::string & scene_name, unsigned int lightbounces) : PathTracer(scene_name)
+BiDirectionalPT::BiDirectionalPT(const std::string & scene_name, unsigned int lightbounces) : PathTracer(scene_name, true)
 {
 	lightBounces = lightbounces;
 	getLightEmitters();
 }
 
 
-BiDirectionalPT::BiDirectionalPT(const Scene & scene, unsigned int lightbounces) : PathTracer(scene)
+BiDirectionalPT::BiDirectionalPT(const Scene & scene, unsigned int lightbounces) : PathTracer(scene, true)
 {
 	lightBounces = lightbounces;
 	getLightEmitters();
 }
 
-BiDirectionalPT::BiDirectionalPT(const std::string & scene_name) : PathTracer(scene_name)
+BiDirectionalPT::BiDirectionalPT(const std::string & scene_name) : PathTracer(scene_name, true)
 {
 	lightBounces = 2;
 	getLightEmitters();
 }
 
 
-BiDirectionalPT::BiDirectionalPT(const Scene & scene) : PathTracer(scene)
+BiDirectionalPT::BiDirectionalPT(const Scene & scene) : PathTracer(scene, true)
 {
 	lightBounces = 2;
 	getLightEmitters();

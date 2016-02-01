@@ -9,8 +9,8 @@ class PathTracer
 	
 	public:
 		//functions
-		PathTracer(const std::string & scene_name);
-		PathTracer(const Scene & scene);
+		PathTracer(const std::string & scene_name, bool sampleLight_);
+		PathTracer(const Scene & scene, bool sampleLight_);
 		virtual Color calculatePixelColor(const Ray & ray) const;
 	
 	private:
@@ -21,6 +21,8 @@ class PathTracer
 		Color glossyBRDF(const Shape &obj, const Ray & ray, const Vector & hitpoint, const Vector & nl, int depth, int E) const;
 		Color diffuseBRDF(const Shape &obj, const Ray & ray, const Vector & hitpoint, const Vector & nl, int depth, int E) const;
 		Color specularBRDF(const Shape &obj, const Ray & ray, const Vector & hitpoint, const Vector & nl, int depth) const;
+		//
+		bool sampleLight;
 
 	protected:
 		//variables:
