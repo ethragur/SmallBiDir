@@ -1,0 +1,7 @@
+#!bin/bash
+#used to build documentation as pdf
+pdflatex --output-directory=build bi_dir_pathtracing_documentation_breitfuss_kuhnert_siess.tex
+pdflatex --output-directory=build bi_dir_pathtracing_documentation_breitfuss_kuhnert_siess.tex
+bibtex build/bi_dir_pathtracing_documentation_breitfuss_kuhnert_siess.aux
+pdflatex --output-directory=build bi_dir_pathtracing_documentation_breitfuss_kuhnert_siess.tex
+pdflatex --output-directory=build bi_dir_pathtracing_documentation_breitfuss_kuhnert_siess.tex
