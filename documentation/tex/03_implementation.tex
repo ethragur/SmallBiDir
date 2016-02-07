@@ -1,2 +1,20 @@
 \section{Implementation}
-TODO: describe implemented functions (pdf, brdf)
+Our bidirectional pathtracer can take 3 optional parameters: The number of sub samples, the number of light samples
+and the scene name without the path and file extension, the scene file has to be in the data directory.
+
+At first the bidirectional pathtracer starts to save all light emitter of the scene into an array.
+After that it creates a light path array. A light path is a struct that consists of the following attributes:
+The point where the light hits an object
+The current accumulated color
+The id of the light, and the id of the object
+
+For each light emitter in the scene a random uniform direction vector will be created, and a ray will be shot into the scene from the light
+Like the pathtracer it will use the BRDFs to bounce around in the scene and save it in the light path structure. When there is no intersection it will ignore the light path.
+
+After the construction of the light path it runs an iterative version of the pathtracing algorithm. When a diffuse surface is hit, that isn't a light emitter an explicit computation of direct lighting will take place.
+Afterwards the function shootShadowRay() function will be called.
+This function looks at every path in the previously constructed light path array and create a direction vector between the current hitpoint from the path tracing algorithm and each hitpoint in the light path.
+Then it checks if those 2 points are able to see eachother wihtout intersection between other objectes in the scene
+When there is no intersection the probability distribution function are calculated. For a diffuse surface this is done via the dot product of the direction and the object normal divided by \(\pi\).
+The final light influence is calculated by using the absorbed color time both PDFs divided by the distance between both hitpoints.
+

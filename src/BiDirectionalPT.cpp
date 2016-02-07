@@ -27,7 +27,7 @@ BiDirectionalPT::BiDirectionalPT(const Scene & scene) : PathTracer(scene, true)
 	getLightEmitters();
 }
 
-/* save all the light emitters of the scene in a array */
+/* save all the light emitters of the scene in an array */
 void BiDirectionalPT::getLightEmitters()
 {
 	//save all light emitters and determine their size
