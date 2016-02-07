@@ -1,5 +1,5 @@
 #include "BiDirectionalPT.h"
-
+/* constructor with scene name and the number of time the lightray should bounce through the scene */
 BiDirectionalPT::BiDirectionalPT(const std::string & scene_name, unsigned int lightbounces) : PathTracer(scene_name, true)
 {
 	lightBounces = lightbounces;
@@ -7,6 +7,7 @@ BiDirectionalPT::BiDirectionalPT(const std::string & scene_name, unsigned int li
 }
 
 
+/* constructor with the builded scene and the number of time the lightray should bounce through the scene */
 BiDirectionalPT::BiDirectionalPT(const Scene & scene, unsigned int lightbounces) : PathTracer(scene, true)
 {
 	lightBounces = lightbounces;
@@ -25,6 +26,8 @@ BiDirectionalPT::BiDirectionalPT(const Scene & scene) : PathTracer(scene, true)
 	lightBounces = 2;
 	getLightEmitters();
 }
+
+/* save all the light emitters of the scene in a array */
 void BiDirectionalPT::getLightEmitters()
 {
 	//save all light emitters and determine their size
@@ -41,6 +44,7 @@ void BiDirectionalPT::getLightEmitters()
 	noLights = lightEmitters.size();
 }
 
+/*  start tracing with path tracing */
 Color BiDirectionalPT::calculatePixelColor(const Ray & ray) const
 {
 	std::vector<LightPath> allLightpaths = traceLightRays(lightBounces);
@@ -50,8 +54,9 @@ Color BiDirectionalPT::calculatePixelColor(const Ray & ray) const
 
 /* Shoot a ray from every light in the scene
  * and let it bounce  off a few objects in the scene
+ * the accumulated color, the hitted object are stored in the LightPath array 
  *
- * This method looks similar to the Radiance() function... Maybe I should do something about that
+ * This method looks similar to the Radiance() function.
  * */
 std::vector<LightPath> BiDirectionalPT::traceLightRays(const int bounces) const
 {
@@ -145,6 +150,7 @@ std::vector<LightPath> BiDirectionalPT::traceLightRays(const int bounces) const
 	return lightPath;
 }
 
+/* iterative version of the Path Tracing algorithm, the recursive version with more documentation is in PathTracer.cpp */
 Color BiDirectionalPT::Radiance(const Ray &ray, const std::vector<LightPath> & lp ) const
 {
 	int depth = 0;
@@ -177,6 +183,7 @@ Color BiDirectionalPT::Radiance(const Ray &ray, const std::vector<LightPath> & l
 		double p = col.Max();
 
 
+		//when we didn't hit a diff surface save the color
 		if(sampleLights || obj.refl != DIFF)
 			cl = cl + cf.MultComponents(obj.emission);
 		if (++depth > 5 || !p)   /* After 5 bounces or if max reflectivity is zero */
@@ -189,7 +196,9 @@ Color BiDirectionalPT::Radiance(const Ray &ray, const std::vector<LightPath> & l
 
 		cf = cf.MultComponents(col);
 
+		//direction Vector, calculated with the BRDFs
 		Vector dir;
+
 		if (obj.refl == DIFF)
 		{
 			dir = diffuseBRDF(nl);
@@ -233,6 +242,7 @@ Color BiDirectionalPT::Radiance(const Ray &ray, const std::vector<LightPath> & l
 	}
 }
 
+/* Direct Light Sample method */
 Color BiDirectionalPT::explicitComputationOfDirectLight(const Vector & hitpoint, const Shape & object, const Vector & nl) const
 {
 	Vector e(0,0,0);	
@@ -301,6 +311,10 @@ Vector BiDirectionalPT::uniformSampleSphere() const
 }
 
 
+/* returns the probability that diffuse material reflects in a ceratin direction
+ * nl : the normal of the Material
+ * outRay : the outgoing direction
+ */
 double BiDirectionalPT::diffusePdf( const Vector & nl, const Vector & outRay )
 {
 	return (nl.Dot(outRay) / M_PI);
@@ -330,15 +344,17 @@ bool BiDirectionalPT::checkVisibility(const Vector & p1, const Vector & p2, int 
 }
 
 //TODO pdf for all materials
-//
 
 
 /* Shoot shadow ray for each hitobject from camera (and bounces of camera) to each Path of the Light Ray
+ * lightPath: The path which was calculated by the traceLightRays() function
+ * object: the object that was hit by a camera ray
+ * hitpoint: The point where the object was hit
+ * id: the id where the object is stored in the scene
  * returns Color influence to Ray
  * */
 Color BiDirectionalPT::shootShadowRay(const std::vector<LightPath> & lightPath, const Shape & object, const Vector & hitpoint, int id) const
 {
-
 	Vector e(0,0,0);
 
 	if(object.refl == DIFF)
@@ -348,10 +364,15 @@ Color BiDirectionalPT::shootShadowRay(const std::vector<LightPath> & lightPath, 
 			//create directional vector between light hitpoint and camera hitpoint
 			Vector dir = hitpoint - lightPath[i].hitpoint ;
 			Vector dirNorm = dir.Normalized();
+			//is there a shadowray?
 			if(checkVisibility(lightPath[i].hitpoint, dirNorm, id))
 			{
+				//get normal of enlightend Object
 				const Vector & enlightenObjNormal = our_scene.get_shapes()[lightPath[i].objectid]->get_normal(lightPath[i].hitpoint);
+
+				//the diffuse PDF for the enlightend object
 				double diffEnlightenPdf = std::max(0.0, dirNorm.Dot(enlightenObjNormal)) * M_1_PI;
+				//the diffuse PDF for the camera object
 				double diffEyePdf = std::max(0.0,dirNorm.Dot(object.get_normal(hitpoint))) * M_1_PI;
 
 				double distanceSqr = dir.Dot(dir);

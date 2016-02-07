@@ -11,10 +11,10 @@ public:
            Vector color_, Refl_t refl_)
     {
         radius = radius_;
-	color = color_;
-	refl = refl_;
-	emission = emission_;
-	position = position_;
+		color = color_;
+		refl = refl_;
+		emission = emission_;
+		position = position_;
     }
 
     double intersect(const Ray &ray) const
