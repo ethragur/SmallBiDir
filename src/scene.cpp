@@ -26,7 +26,7 @@ void Scene::load_scene(std::string filename, std::string matfiles)
         exit(1);
     }
 
-    std::cout << "# of shapes: " << shapes.size() << std::endl;
+    std::cout << "# of triangles: " << shapes.size() << std::endl;
     std::cout << "# of materials: " << materials.size() << std::endl;
 
     // Extract elements and build triangles for our scene from them
@@ -78,8 +78,6 @@ void Scene::load_scene(std::string filename, std::string matfiles)
         // Clear stack for next triangles
         vertices.clear();
     }
-
-    std::cout << "Done Loading!" << std::endl;
 }
 
 /*********************************************************

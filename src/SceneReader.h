@@ -11,31 +11,40 @@
 class SceneReader
 {
 	public:
-		void ReadScene(const Scene & scene, const std::string & name)
+		void ReadScene(Scene & scene, const std::string & name)
 		{
 			std::ifstream f(name);
-			if(f.isOpen())
+			std::cout << "Loading " << name << "..." << std::endl;
+			if(f.is_open())
 			{
+				int i = 0;
 				while ( !f.eof() )
 				{
+					i++;
 					double radius;
-					Vector position;
-					Vector emission;
-					Vector color;
+					double posx;
+					double posy;
+					double posz;
+					double emir;
+					double emig;
+					double emib;
+					double colr;
+					double colg;
+					double colb;
 					std::string reflection;
 
 					f >> radius;
-					f >> position.x;
-					f >> position.y;
-					f >> position.z;
-					f >> emission.x;
-					f >> emission.y;
-					f >> emission.z;
-					f >> color.x;
-					f >> color.y;
-					f >> color.z;
+					f >> posx;
+					f >> posy;
+					f >> posz;
+					f >> emir;
+					f >> emig;
+					f >> emib;
+					f >> colr;
+					f >> colg;
+					f >> colb;
 					f >> reflection;
-					
+
 					Refl_t refl;
 					if(reflection.compare("DIFF") == 0)
 							refl = DIFF;
@@ -50,10 +59,14 @@ class SceneReader
 					else
 							refl = DIFF;
 
-					scene.add_sphere(new Sphere(radius, position, emission, color, refl));
-					
+					Sphere *toAdd = new Sphere(radius, Vector(posx,posy,posz), Vector(emir, emig, emib), Vector(colr, colg, colb), refl);
+					scene.add_sphere(toAdd);
+					int tmp;
+					//fix for reading
+					f >> tmp;
 				}
-				myfile.close();
+				f.close();
+				std::cout << "# of spheres: " << i << std::endl;
 			}
 
 		}

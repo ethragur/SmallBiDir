@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 	else
 		std::cout << "Paramaters: <Nr. of Subsamples> <LightSamples> <SceneName>"  << std::endl << "Usage Example: ./PathTracing 16 4 scene1" << std::endl;
 
-	BiDirectionalPT p(std::string("../data/" + scene_filename + ".obj"), lightbounces);
+	BiDirectionalPT p(scene_filename, 2);
 //	PathTracer p(std::string("../data/" + scene_filename + ".obj"), false);
 	Renderer r(1024, 768, samples);
 
