@@ -1,0 +1,9 @@
+PWD /home/max/Documents/SmallBiDir/documentation
+INPUT /usr/share/texmf-dist/web2c/texmf.cnf
+INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
+INPUT bi_dir_pathtracing_documentation_breitfuss_kuhnert_siess.tex
+OUTPUT bi_dir_pathtracing_documentation_breitfuss_kuhnert_siess.log
+INPUT /usr/share/texmf-dist/tex/latex/base/article.cls
+INPUT /usr/share/texmf-dist/tex/latex/base/article.cls
+INPUT /usr/share/texmf-dist/tex/latex/base/size10.clo
+INPUT /usr/share/texmf-dist/tex/latex/base/size10.clo
