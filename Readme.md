@@ -27,3 +27,5 @@ L = Light Bounces
 scene# scene located at data/  (do not absoulut path or file extension)
 
 Available scenes: scene, scene1, scene2, scene3, scene4, scene5
+
+Example: ./PathTracing 16 4 scene5
