@@ -63,10 +63,10 @@ class SceneReader
 					scene.add_sphere(toAdd);
 					int tmp;
 					//fix for reading
-					f >> tmp;
+				//	f >> tmp;
 				}
 				f.close();
-				std::cout << "# of spheres: " << i << std::endl;
+				std::cout << "# of spheres: " << i-1 << std::endl;
 			}
 
 		}
