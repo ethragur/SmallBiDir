@@ -119,23 +119,23 @@ std::vector<LightPath> BiDirectionalPT::traceLightRays(const int bounces) const
 			if (hit_object.refl == DIFF)
 			{
 				lightPath.push_back(LightPath(hitpoint, cl, it->first, id));
-				dir = material.diffuseBRDF(nl);
+				dir = MaterialBRDF::diffuseBRDF(nl);
 			}
 			else if (hit_object.refl == SPEC)
 			{
-				dir = material.specularBRDF(r, nl);
+				dir = MaterialBRDF::specularBRDF(r, nl);
 			}
 			else if(hit_object.refl == GLOSSY)
 			{
-				dir = material.glossyBRDF(r, nl);
+				dir = MaterialBRDF::glossyBRDF(r, nl);
 			}
 			else if(hit_object.refl == TRANSL)
 			{
-				dir = material.translBRDF(r, n, nl, cf);
+				dir = MaterialBRDF::translBRDF(r, n, nl, cf);
 			}
 			else if(hit_object.refl == REFR)
 			{
-				dir = material.refrBRDF(r, n, nl, cf);
+				dir = MaterialBRDF::refrBRDF(r, n, nl, cf);
 			}
 			else
 			{
@@ -213,22 +213,22 @@ Color BiDirectionalPT::Radiance(const Ray &ray, const std::vector<LightPath> & l
 		}
 		else if (obj.refl == SPEC)
 		{
-			dir = material.specularBRDF(r, nl);
+			dir = MaterialBRDF::specularBRDF(r, nl);
 			sampleLights = true;
 		}
 		else if(obj.refl == GLOSSY)
 		{
-			dir = material.glossyBRDF(r, nl);
+			dir = MaterialBRDF::glossyBRDF(r, nl);
 			sampleLights = true;
 		}
 		else if(obj.refl == TRANSL)
 		{
-			dir = material.translBRDF(r, n, nl, cf);
+			dir = MaterialBRDF::translBRDF(r, n, nl, cf);
 			sampleLights = true;
 		}
 		else if(obj.refl == REFR)
 		{
-			dir = material.refrBRDF(r, n, nl, cf);
+			dir = MaterialBRDF::refrBRDF(r, n, nl, cf);
 			sampleLights = true;
 		}
 		else

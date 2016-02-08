@@ -43,7 +43,6 @@ class BiDirectionalPT : public PathTracer
 		Color Radiance(const Ray &ray, const std::vector<LightPath> & lp) const;
 		Vector uniformSampleSphere() const; 
 		double diffusePdf( const Vector & inpDir, const Vector & outRay );
-		MaterialBRDF material;
 		/*
 		Vector diffuseBRDF(const Vector & nl) const;
 		Vector glossyBRDF(const Ray & ray, const Vector & nl) const;

@@ -1,7 +1,7 @@
 class MaterialBRDF 
 {
 	public:
-		Vector diffuseBRDF(const Vector & nl) const
+		static Vector diffuseBRDF(const Vector & nl) 
 		{
 			/* Compute random reflection vector on hemisphere */
 			double r1 = 2.0 * M_PI * drand48();
@@ -30,7 +30,7 @@ class MaterialBRDF
 			return d;
 		}
 
-		Vector glossyBRDF(const Ray & ray, const Vector & nl) const
+		static Vector glossyBRDF(const Ray & ray, const Vector & nl) 
 		{
 			//cosine distribution??
 			const double r1 = 2.0 * M_PI * drand48();
@@ -62,7 +62,7 @@ class MaterialBRDF
 			return d;
 		}
 		
-		Vector translBRDF(const Ray & ray, const Vector & n, const Vector & nl, Color & cf) const
+		static Vector translBRDF(const Ray & ray, const Vector & n, const Vector & nl, Color & cf) 
 		{
 			//cosine distribution??
 			const double r1 = 2.0 * M_PI * drand48();
@@ -167,7 +167,7 @@ class MaterialBRDF
 			return  tdir;
 		}
 
-		Vector refrBRDF(const Ray & ray, const Vector & n, const Vector & nl, Color & cf) const
+		static Vector refrBRDF(const Ray & ray, const Vector & n, const Vector & nl, Color & cf) 
 		{
 
 			/* Object is transparent, i.e. assumed dielectric glass material */
@@ -232,7 +232,7 @@ class MaterialBRDF
 			return tdir;
 		}
 
-		Vector specularBRDF(const Ray & ray, const Vector & nl) const
+		static Vector specularBRDF(const Ray & ray, const Vector & nl) 
 		{
 			return (ray.dir - nl * 2 * nl.Dot(ray.dir));
 		}
