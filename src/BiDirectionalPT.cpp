@@ -201,7 +201,7 @@ Color BiDirectionalPT::Radiance(const Ray &ray, const std::vector<LightPath> & l
 
 		if (obj.refl == DIFF)
 		{
-			dir = material.diffuseBRDF(nl);
+			dir = MaterialBRDF::diffuseBRDF(nl);
 			bool isNotLight = lightEmitters.find(id) == lightEmitters.end();
 			if(!isNotLight && i == 0)
 				cl = cl + cf.MultComponents(obj.emission);
