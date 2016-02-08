@@ -8,6 +8,7 @@ Advanced Computer Graphics course at University Innsbruck
 It is based on smallpt with explicit lighting
 
 Build Instructions:
+========================
 
 mkdir build
 
